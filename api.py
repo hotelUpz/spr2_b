@@ -83,7 +83,13 @@ class TelegramNotifier:
         except Exception as e:
             print(f"Ошибка при удалении сообщения: {e}")
 
-    async def send(self, text: str, photo_bytes: bytes = None, auto_delete: Optional[Union[int, float]] = None):
+    async def send(
+            self,
+            text: str,
+            photo_bytes: bytes = None,
+            auto_delete: Optional[Union[int, float]] = None,
+            disable_notification: bool = True
+        ):
         async with aiohttp.ClientSession() as session:
             for chat_id in self.chat_ids:
                 if photo_bytes:
@@ -94,7 +100,7 @@ class TelegramNotifier:
                     data.add_field("caption", caption)
                     data.add_field("parse_mode", "HTML")
                     data.add_field("disable_web_page_preview", "true")
-                    data.add_field("disable_notification", str(bool(auto_delete)).lower())
+                    data.add_field("disable_notification", str(disable_notification).lower())
                     data.add_field("photo", photo_bytes, filename="spread.png", content_type="image/png")
                 elif text:
                     url = self.base_tg_url + self.send_text_endpoint
@@ -103,7 +109,7 @@ class TelegramNotifier:
                         "text": text,
                         "parse_mode": "HTML",
                         "disable_web_page_preview": True,
-                        "disable_notification": bool(auto_delete)
+                        "disable_notification": disable_notification
                     }
                 else:
                     return

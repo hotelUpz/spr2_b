@@ -260,8 +260,13 @@ class Main(DataFetcher):
     async def msg_collector(self, is_text_refresh_time: bool) -> None:
         """Collects and sends messages based on symbol data and conditions."""
 
-        async def send_signal(msg, plot_bytes=None, auto_delete=None):
-            await self.notifier.send(msg, photo_bytes=plot_bytes, auto_delete=auto_delete)
+        async def send_signal(msg, plot_bytes=None, auto_delete=None, disable_notification=True):
+            await self.notifier.send(
+                msg,
+                photo_bytes=plot_bytes,
+                auto_delete=auto_delete,
+                disable_notification=disable_notification
+            )
 
         def prepare_signal_message(symbol, symbol_data, position_side, action):
             mexc_price = symbol_data.get("mexc_price")
@@ -301,12 +306,12 @@ class Main(DataFetcher):
                 # Отправка сигналов на открытие
                 for position_side, _ in instruction_open:
                     msg = prepare_signal_message(symbol, symbol_data, position_side, "is_opening")
-                    await send_signal(msg, plot_bytes=plot_bytes)
+                    await send_signal(msg, plot_bytes=plot_bytes, disable_notification=False)
 
                 # Отправка сигналов на закрытие
                 for position_side, _ in instruction_close:
                     msg = prepare_signal_message(symbol, symbol_data, position_side, "is_closing")
-                    await send_signal(msg, plot_bytes=plot_bytes)
+                    await send_signal(msg, plot_bytes=plot_bytes, disable_notification=False)
 
             except Exception as ex:
                 print(f"[ERROR] msg_collector for symbol {symbol} failed: {ex}\n{traceback.format_exc()}")
