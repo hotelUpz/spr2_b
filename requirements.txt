@@ -1,0 +1,9 @@
+# pandas==2.0.3
+pandas
+aiogram
+aiohttp
+requests
+pytz
+matplotlib
+scipy
+
